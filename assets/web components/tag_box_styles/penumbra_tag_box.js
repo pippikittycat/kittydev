@@ -1,0 +1,15 @@
+import {createComponent} from 'https://codepen.io/pippikittycat/pen/MYbbYzB.js'
+
+import styles from "https://codepen.io/pippikittycat/pen/KwNgxXZ.css" with {type: "css"};
+
+createComponent({
+  tagName: 'penumbra-tag-box',
+  attributes: ['text'],
+  stylesheet: styles,
+
+  render: ({text}) => `
+    <div class="flex row brown-sugar-bg fit-content circle-corners soft-pillow arial-nova">
+<p class="no-margin small-padding">${text}</p>
+</div>
+  `,
+});

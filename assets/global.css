@@ -1,0 +1,291 @@
+/*--COLOR PALLETE--*/
+
+/*Brown Sugar*/
+.brown-sugar {
+  color: rgb(176, 118, 68);
+}
+
+.brown-sugar-bg {
+  background-color: rgb(176, 118, 68);
+}
+
+/*Medium Roast*/
+
+.medium-roast {
+  color: rgb(57, 33, 13);
+}
+
+.medium-roast-bg {
+  background-color: rgb(57, 33, 13);
+}
+
+.dark-button {
+  transition: 0.5s;
+}
+
+.dark-button:hover {
+  background-color: rgb(57, 33, 13);
+}
+
+/*Irish Coffee*/
+
+.irish-coffee {
+  color: rgb(115, 68, 30);
+}
+
+.irish-coffee-bg {
+  background-color: rgb(115, 68, 30);
+}
+
+/*Soft Pillow*/
+
+.soft-pillow {
+  color: rgb(253, 244, 232);
+}
+
+.soft-pillow-bg {
+  background-color: rgb(253, 244, 232);
+}
+
+.light-button {
+  transition: 0.5s;
+}
+
+.light-button:hover {
+  background-color: rgb(222, 199, 179);
+}
+
+/*Tapioca*/
+
+.tapioca {
+  color: rgb(222, 199, 179);
+}
+
+.tapioca-bg {
+  background-color: rgb(222, 199, 179);
+}
+
+/*Decreasing Brown*/
+
+.decreasing-brown {
+  color: rgb(156, 119, 90);
+}
+
+.decreasing-brown-bg {
+  background-color: rgb(156, 119, 90);
+}
+
+/*Almond*/
+
+.almond {
+  color: rgb(242, 229, 217);
+}
+
+.almond-bg {
+  background-color: rgb(242, 229, 217);
+}
+
+/*Polar Bear*/
+
+.polar-bear {
+  color: rgb(235, 233, 222);
+}
+
+.polar-bear-bg {
+  background-color: rgb(235, 233, 222);
+}
+
+/*Mistletoe*/
+
+.mistletoe {
+  color: rgb(139, 160, 124);
+}
+
+.mistletoe-bg {
+  background-color: rgb(139, 160, 124);
+}
+
+/*--FONTS--*/
+
+.arial-nova {
+  font-family: Inter, Roboto, 'Helvetica Neue', 'Arial Nova', 'Nimbus Sans', Arial, sans-serif;
+}
+
+.birthstone-bounce {
+  font-family: "Birthstone Bounce", cursive;
+}
+
+.bitstream-charter {
+  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+}
+
+/*--Text Styles--*/
+
+.spaced-text {
+  letter-spacing: 0.15em;
+}
+
+.large-text {
+  font-size: 1.25rem;
+}
+
+.medium-text {
+  font-size: 1rem;
+  /*TO DO: MAKE MOBILE 1.125rem*/
+}
+
+.small-text {
+  font-size: .875rem;
+}
+
+.small-line-height {
+  line-height: 1.3;
+}
+
+.medium-line-height {
+  line-height: 1.5;
+}
+
+.large-line-height {
+  line-height: 1.2;
+}
+
+.small-text-space {
+  letter-spacing: -.25px;
+}
+
+.bold-weight {
+  font-weight: bold;
+}
+
+.normal-weight {
+  font-weight: normal;
+}
+
+.thin-weight {
+  font-weight: thin;
+}
+
+.no-text-decoration {
+  text-decoration: none;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
+/*-- Headers --*/
+
+h1 {
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
+h4 {
+  font-size: 1.25rem;
+}
+
+h5 {
+  font-size: 1.125rem;
+}
+
+h6 {
+  font-size: 1rem;
+}
+
+/*--Button Styles--*/
+
+.flex {
+  display: flex;
+}
+
+.row {
+  flex-direction: row;
+}
+
+.column {
+  flex-direction: column;
+}
+
+.fit-content {
+  width: fit-content;
+}
+
+.rounded-corners {
+  border-radius: 1rem;
+}
+
+.circle-corners {
+  border-radius: 2rem;
+}
+
+.large-padding {
+  padding: 1rem 1.5rem;
+}
+
+.medium-padding {
+  padding: 0;
+}
+
+.small-padding {
+  padding: 0.25rem 0.5rem;
+}
+
+.border {
+  border: 0.125rem solid rgb(222, 199, 179);
+}
+
+.no-margin {
+  margin: 0;
+}
+
+.min-width-color {
+  min-width: 20rem;
+}
+
+/*---ONLY FOR THIS SHEET---*/
+
+/* SVG */
+
+svg {
+  width: 1rem;
+  height: auto;
+  max-width: 100%;
+}
+
+.svg-gap {
+  gap: .5rem;
+}
+
+/*-- Box sizing --*/
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/*-- Canvas Settings --*/
+
+canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  position: absolute;
+}
