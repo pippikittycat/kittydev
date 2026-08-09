@@ -32,7 +32,8 @@ export function createComponent({
 
             // fires when element is inserted into the page, safe to render here because DOM is ready
             // note: NOT called when the element is CREATED, only when it's actually ADDED to the document
-            connectCallback(){
+            // FIXED: Fixed typo missing 'ed'
+            connectedCallback(){
                 this._update();
             }
 
@@ -60,7 +61,7 @@ export function createComponent({
                         // read the attribute's current value off the element
                         // ?? '' means: if getAttribute returns null (attribute not set), use empty string instead
                         // prevents "null" or "undefined" from appearing as text in the rendered HTML
-                      ]
+                      ];
                     })
                 );
                 
@@ -69,7 +70,9 @@ export function createComponent({
                 // rewrite the entire shadow DOM on every update
                 // the css ternary only injects a <style> tag if inline css was provided — avoids an empty <style> tag
                 // render(attrs) calls the user-supplied function and injects the returned HTML string
+                // Injects global.css so Shadow DOM inherits all utility classes
                 this.shadowRoot.innerHTML = `
+                <link rel="stylesheet" href="/assets/global.css">
                 ${css ? `<style>${css}</style>` : ''}
                 ${render(attrs)}
                 `;

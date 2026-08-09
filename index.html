@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Brittney's Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Brittney Farris's Page">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Birthstone+Bounce:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="./assets/global.css">
+    <script type="module" src="./assets/import_script.js"></script>
+</head>
+
+<body class="grid-container">
+        <canvas id="canvas-bg" aria-hidden="true"></canvas>
+
+        <header class="space-between flex bg-highlight bg-alpha-25 glass lborder py-sm px-lg">
+                <a class="no-text-decoration" href="#">
+                    <p class="bitstream-charter text-primary large-text">Brittney <i class="text-secondary birthstone-bounce xlarge-text">Farris</i></p>
+                </a>
+                <nav class="flex row gap-md aligni-center">
+
+                    <button id="theme-toggle-btn" class="arial-nova text-primary" type="button">Toggle Theme</button>
+
+                    <a class="arial-nova text-primary no-text-decoration" href="#">About</a>
+                    <a class="arial-nova text-primary no-text-decoration" href="./portfolio_page/index.html">Portfolio</a>
+                    <a class="arial-nova text-primary no-text-decoration" href="./blogs_page/index.html">Blog</a>
+                    <a class="arial-nova text-primary no-text-decoration" href="./experience_page/index.html">Resume</a>
+                    <content-box text="Contact Me" url-link="#" variant="dark" svg="svg"></content-box>
+                </nav>
+        </header>
+
+        <main class="px-4xl py-2xl flex column">
+            <section class="flex row gap-xl">
+                <img class="avatar-circle" src="https://placehold.co/150"/>
+                <section class="flex column gap-md">
+                    <tag-box text="Open to opportunities" variant="status" svg="•"></tag-box>
+                    <p class="text-tertiary xsmall-text large-spaced-text arial-nova">WEB DEVELOPER • CREATOR • BLOGGER</p>
+                    <h1 class="bitstream-charter text-primary">Hi, I'm <i class="text-secondary birthstone-bounce">Brittney.</i></h1>
+                    <p class="arial-nova text-primary large-line-height small-text">I build things for the web, from polished interfaces to full-stack projects, and document every step of the journey. I believe great code and great writing go hand in hand.</p>
+                    <nav class="flex row gap-sm py-sm">
+                       <content-box text="See my work" url-link="#" variant="dark" svg="svg"></content-box>
+                       <content-box text="Get in touch" url-link="#" variant="light" svg="svg"></content-box>
+                    </nav>
+                </section>
+            </section>
+            <section>
+                <p class="text-secondary large-text spaced-text arial-nova py-md">EXPLORE</p>
+            <nav class="flex space-between">
+                <desc-button title="Portfolio" description="Projects I've design, built and shipped" url-link="#" left-svg="svg" right-svg="svg"></desc-button>
+                <desc-button title="Blog & Dev Logs" description="Learning in public, docs for every project" url-link="#" left-svg="svg" right-svg="svg"></desc-button>
+                <desc-button title="Experience" description="Work history, skills, and resume download" url-link="#" left-svg="svg" right-svg="svg"></desc-button>
+            </nav>
+            </section>
+        </main>
+
+        <footer class="bg-primary bg-alpha-25 glass lborder">
+            <section class="flex space-between py-xs px-xl aligni-center">
+            <p class="text-tertiary arial-nova xsmall-text">© 2026 Brittney Farris</p>
+            <nav>
+                <a class="arial-nova text-primary" href="#">Mail</a>
+                <a class="arial-nova text-primary" href="#">Github</a>
+                <a class="arial-nova text-primary" href="#">LinkedIn</a>
+            </nav>
+            </section>
+        </footer>
+</body>
+
+</html>
