@@ -1,4 +1,3 @@
-// theme.js
 export function initThemeToggle(buttonId = 'theme-toggle-btn') {
   const toggleBtn = document.getElementById(buttonId);
   
@@ -8,18 +7,22 @@ export function initThemeToggle(buttonId = 'theme-toggle-btn') {
     return;
   }
 
-  function setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
-    toggleBtn.textContent = `Theme: ${theme.toUpperCase()}`;
+  function updateButtonLabel(theme) {
+    toggleBtn.textContent = `Theme: ${theme}`;
   }
 
-  const savedTheme = localStorage.getItem('theme') || 'light';
-  setTheme(savedTheme);
+  // 1. Read theme set by blocking script in <head>, fall back to DOM attribute
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  updateButtonLabel(currentTheme);
 
+  // 2. Click handler with CSS transition
   toggleBtn.addEventListener('click', () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
-    setTheme(nextTheme);
+    const activeTheme = document.documentElement.getAttribute('data-theme');
+    const nextTheme = activeTheme === 'dark' ? 'light' : 'dark';
+
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    localStorage.setItem('theme', nextTheme);
+    updateButtonLabel(nextTheme);
+
   });
 }

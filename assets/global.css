@@ -59,6 +59,7 @@ Mappings below are a starting point- swap any of the literal tokens based on pre
   --bg-accent: var(--decreasing-brown);
   --bg-highlight: var(--soft-pillow);
   --bg-status: var(--mistletoe);
+  --bg-background: var(--soft-pillow);
 
   /* Typography */
   --text-primary: var(--medium-roast);
@@ -81,6 +82,7 @@ Mappings below are a starting point- swap any of the literal tokens based on pre
   --bg-tertiary: var(--pastel-lavender);
   --bg-accent: var(--sugar-plum);
   --bg-highlight: var(--charcoal-plum);
+  --bg-background: var(--obsidian);
 
   /* Typography */
   --text-primary: var(--soft-fog);
@@ -90,8 +92,8 @@ Mappings below are a starting point- swap any of the literal tokens based on pre
   --text-highlight: var(--obsidian);
 
   /* Accents & Highlights */
-  --lborder-color: var(--obsidian);
-  --dborder-color: var(--charcoal-plum)
+  --lborder-color: var(--charcoal-plum);
+  --dborder-color: var(--sugar-plum);
 }
 
 /*=====================================================
@@ -155,6 +157,7 @@ If a value here is changed, it'll update across the site.
   --radius-lg: 2rem;
   --radius-full: 50%;
   
+  --border-width-sm: 0.050rem;
   --border-width-std: 0.075rem;
   --icon-size-std: 1rem;
 
@@ -197,6 +200,12 @@ Use these for page structure so theme toggling works automatically.
   --active-color: var(--bg-status);
 }
 
+/* Created as a fallback if canvas generation fails */
+.bg-background {
+  background-color: rgb(var(--bg-background));
+  --active-color: var(--bg-background);
+}
+
 .text-primary { color: rgb(var(--text-primary)); }
 .text-secondary { color: rgb(var(--text-secondary)); }
 .text-tertiary { color: rgb(var(--text-tertiary)); }
@@ -204,9 +213,6 @@ Use these for page structure so theme toggling works automatically.
 .text-highlight { color: rgb(var(--text-highlight)); }
 .text-footer { color: rgb(var(--text-footer)); }
 .text-status { color: rgb(var(--text-status)); }
-
-
-.theme-transition { transition: background-color 0.3s, color 0.3s, border-color 0.3s;}
 
 /*=====================================================
 5. COLOR PALETTE - LITERAL UTILITY CLASSES 
@@ -364,9 +370,10 @@ h6 { font-size: var(--text-sm); }
 }
 
 body {
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
+  /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 /* Flexbox Helpers */
@@ -397,17 +404,14 @@ body {
 
 /* Border & Radius Utilities */
 
-.lborder {
-  border-style: solid;
-  border-width: var(--border-width-std, 0.125rem);
-  border-color: rgb(var(--lborder-color)); 
-}
+.lborder { border: var(--border-width-std, 0.075rem) solid rgb(var(--lborder-color)); }
+.dborder { border: var(--border-width-std, 0.075rem) solid rgb(var(--dborder-color)); }
 
-.dborder {
-  border-style: solid;
-  border-width: var(--border-width-std, 0.125rem);
-  border-color: rgb(var(--dborder-color)); 
-}
+.lborder-t { border-top: var(--border-width-sm, 0.050rem) solid rgb(var(--lborder-color)); }
+.lborder-b { border-bottom: var(--border-width-sm, 0.050rem) solid rgb(var(--lborder-color)); }
+
+.dborder-t { border-top: var(--border-width-sm, 0.050rem) solid rgb(var(--dborder-color)); }
+.dborder-b { border-bottom: var(--border-width-sm, 0.050rem) solid rgb(var(--dborder-color)); }
 
 .bevel-corners { border-radius: var(--radius-sm); }
 .rounded-corners { border-radius: var(--radius-md); }
@@ -492,13 +496,13 @@ svg { /*=====================================================TO DO: EXAMINE IF N
 canvas { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
   display: block;
   position: fixed; /* Fixed: changed from absolute so it covers the screen during scoll*/
-  top: 0;
-  left: 0;
-  width: 100vw; /* Fixed: Explicit viewport units prevent white edge gaps*/
-  height: 100vh; /* Fixed: Explicit viewport units prevent white edge gaps*/
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
+  height: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
   z-index: -1;
   pointer-events: none;
-  filter: blur(1.5px);
+  filter: blur(1px);
 }
 
 /* Media Queries */
