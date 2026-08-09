@@ -15,19 +15,14 @@ This is my modular website, featuring a custom web-components framework, built t
 - **Styling:** Custom CSS3 with global design variables
 - **Icons:** Optimized SVG vectors
 
-## Repository Structure As Of: `May 18, 2026`
+## Repository Structure As Of: `August 9, 2026`
 
 ```text
 ├── assets/                                  # Overall asset folder
 │   ├── web components/                      # Custom reusable UI elements
-│   │   ├── box/                             # Contains all box web components
-│   │   │   ├── button styles/
-│   │   │   │   ├── dark_content_button.js
-│   │   │   │   └── light_content_button.js
-│   │   ├── tag_box_styles
-│   │   │   ├── dark_tag_box.js
-│   │   │   ├── light_tag_box.js
-│   │   │   └── penumbra_tag_box.js
+│   │   ├── tag_box.js
+│   │   ├── content_box.js
+│   │   ├── description_content_box.js
 │   │   └── factory_script.js                # Web component boilerplate code template
 │   ├── svg library/                         # General SVG library 
 │   │   ├── circle-fill.svg
@@ -40,26 +35,26 @@ This is my modular website, featuring a custom web-components framework, built t
 │   │   └── envelope-fill.svg
 │   ├── global.css                          # Site-wide typography and color variables
 │   ├── import_script.js                    # Imports all scripts into a single file for HTML ease
-│   ├── background_img.jpg
-│   └── background_generation.js            # Dynamic background effects
+│   ├── theme_toggle.js                     # Enables theme toggling from light to dark mode
+│   └── background_generation_script.js     # Dynamic background effects
 ├── blogs_page/
 │   └── index.html
 ├── experience_page/
 │   └── index.html
-├── home_page/
-│   └── index.html
 ├── portfolio_page/
 │   └── index.html
-├── stylesheet_page/
+├── stylesheet_page/                        # Visual guide to color palette/fonts
 │   └── index.html
-└── README.md                                # Project documentation
+├── index.html                              # Home page
+├── CNAME                                   # Custom domain
+└── README.md                               # Project documentation
 ```
 
 ## Roadmap
 
-- [ ] Connect custom web components to core HTML layout.
-- [ ] Implement dark/light theme switching functionality.
+- [x] ~~Connect custom web components to core HTML layout.~~
+- [x] ~~Implement dark/light theme switching functionality.~~
+- [ ] **IN PROGRESS:** Set up a CSS grid framework (with media breakpoints) for a responsive website layout between desktops, tablets, and phones.
+- [ ] **IN PROGRESS:** Make website accessible for users that complies with WCAG 2.1 AA and/or WCAG 2.2 AAA.
 - [ ] Populate each page with their respective content.
 - [ ] Create a backend for storing blog posts that can be edited, created, and deleted only by me.
-- [ ] Set up a CSS grid framework (with media breakpoints) for a responsive website layout between desktops, tablets, and phones.
-- [ ] Make website accessible for users that complies with WCAG 2.1 AA and/or WCAG 2.2 AAA.
