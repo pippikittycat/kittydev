@@ -1,4 +1,4 @@
-import { createComponent } from '../web components/factory_code.js'
+import { createComponent } from './factory_code.js'
 
 /* FIXED: This uses CSS module assertions, which can cause browsers like Firefox/standard dev setups to crash on this line
 and half the file exe before createComponent can run. Should already be loaded in HTML header anyways
