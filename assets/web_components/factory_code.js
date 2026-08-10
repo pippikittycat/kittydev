@@ -1,83 +1,140 @@
-//reusable factory function that generates a web component from just a tag name, HTML string, and an optional CSS string
-//import it into any file to define a component without needing to write boilerplate code
-//accepts single options object so arguments can be skipped or added without breaking existing calls
+// Fetch global CSS stylesheet once and share across all ShadowDOM roots
+let globalStyleSheet = null;
+
+const globalStyleSheetPromise = fetch('./assets/global.css')
+    .then(res => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.text();
+    })
+    .then(cssText => {
+        const sheet = new CSSStyleSheet();
+        sheet.replaceSync(cssText);
+        globalStyleSheet = sheet; // Cache synchronously once parsed
+        return sheet;
+    })
+    .catch(e => {
+        console.error('Failed to load global.css into Shadow DOM stylesheet', e);
+        return null;
+    });
 
 export function createComponent({
-    tagName, // the HTML tag name (must contain hyphen if multiple words)
-    attributes = [], // list of HTML attributes to watch for changes, defaults to empty array if none are needed
-    stylesheet = null, //adoptedStyleSheets = shared CSSStyleSheet object, parsed once and reused across all instances
-    css = '', // fallback inline css string, used when there is no external stylesheet
-    render, // (attrs) -> HTML string (only thing actually written per component)
-    error,
+    tagName,
+    attributes = [],
+    render,
+    updateTarget, // Optional targeted update hook: (shadowRoot, name, newValue, attrs) => void
+    error
 }) {
     customElements.define(
         tagName,
-        //anonymous class (no name needed since customElements.define registers it under tagName)
         class extends HTMLElement {
-
-            //tells browser which attributes to watch (without this, attributeChangedCallback will never fire)
             static get observedAttributes() {
                 return attributes;
             }
 
             constructor() {
-                super(); //always required first, sets up HTMLElement internals
-                this.attachShadow({mode: 'open'}); // 'open means external JS can still access shadowRoot, 'closed' would block it
+                super();
+                this.attachShadow({ mode: 'open' });
+                this._isMounted = false;
+            }
 
-                //only attach stylesheet if one was provided (avoids overwriting the default empty adoptedStyleSheets)
-                if(stylesheet) {
-                    this.shadowRoot.adoptedStyleSheets = [stylesheet];
+            connectedCallback() {
+                // 1. Initial full render on mounnt
+                if (!this._isMounted) {
+                    const attrs = this._getParsedAttributes();
+
+                    if (typeof error === 'function') {
+                        error(attrs);
+                    }
+
+                    // Render initial HTML structure
+                    this.shadowRoot.innerHTML = render(attrs);
+                    this._isMounted = true;
+
+                    // Apply any attributes that were set before connected Callback
+                    attributes.forEach(attr => {
+                        const val = this.getAttribute(attr);
+                        if (val !== null) {
+                            this._applyUpdate(attr, val, attrs);
+                        }
+                    });
+                }
+
+                // 2. Attach global CSS stylesheet when ready
+                if (globalStyleSheet) {
+                    this.shadowRoot.adoptedStyleSheets = [globalStyleSheet];
+                } else {
+                    globalStyleSheetPromise.then(sheet => {
+                        if (sheet && this.isConnected) {
+                            this.shadowRoot.adoptedStyleSheets = [sheet];
+                        }
+                    });
                 }
             }
 
-            // fires when element is inserted into the page, safe to render here because DOM is ready
-            // note: NOT called when the element is CREATED, only when it's actually ADDED to the document
-            // FIXED: Fixed typo missing 'ed'
-            connectedCallback(){
-                this._update();
+            attributeChangedCallback(name, oldValue, newValue) {
+                // Only run targeted updated IF the element is already mounted
+                if (this._isMounted && oldValue !== newValue){
+                    const attrs = this._getParsedAttributes();
+
+                    if (typeof error === 'function') {
+                        error(attrs);
+                    }
+                    
+                    this._applyUpdate(name, newValue, attrs);
+                }
             }
 
-            //fires whenever a watched attribute changes (the if guard avoids re-rendering when the value didn't actually change)
-            attributeChangedCallback(name, oldValue, newValue) {
-                if (oldValue !== newValue) this._update();
+            _applyUpdate(name, newValue, attrs) {
+                if (typeof updateTarget === 'function') {
+                    updateTarget(this.shadowRoot, name, newValue, attrs);
+                } else {
+                    this._patchDOM(name, newValue, attrs);
+                }
             }
-            
-            _update(){
-                 // build a plain object of { attrName: value } from observed attributes
-                // .map() produces an array of pairs, Object.fromEntries() converts those pairs into a plain object
-                const attrs = Object.fromEntries(
-                    attributes.map(attr => {
-                      let attrValue = this.getAttribute(attr);
-                      
-                      if (!error) {
-                        attrValue = attrValue ?? ''
-                      }
-                      
-                      return [ // for each attribute, produce a [key, value] pair
-                        // convert kebab-case to camelCase so the render function can destructure cleanly
-                        // e.g. 'image-url' becomes 'imageUrl'
-                        attr.replace(/-([a-z])/g, (_,c) => c.toUpperCase()), //replace the - with _ (which is not rendered) and make the letter after - Uppercase, and do this to every single match
-                        attrValue //make the attribute value able to be read by web component
-                        // read the attribute's current value off the element
-                        // ?? '' means: if getAttribute returns null (attribute not set), use empty string instead
-                        // prevents "null" or "undefined" from appearing as text in the rendered HTML
-                      ];
-                    })
+
+            _getParsedAttributes() {
+                return Object.fromEntries(
+                    attributes.map(attr => [
+                        attr.replace(/-([a-z])/g, (_, c) => c.toUpperCase()),
+                        this.getAttribute(attr) ?? ''
+                    ])
                 );
-                
-                if (error) error(attrs);
-              
-                // rewrite the entire shadow DOM on every update
-                // the css ternary only injects a <style> tag if inline css was provided — avoids an empty <style> tag
-                // render(attrs) calls the user-supplied function and injects the returned HTML string
-                // Injects global.css so Shadow DOM inherits all utility classes
-                this.shadowRoot.innerHTML = `
-                <link rel="stylesheet" href="/assets/global.css">
-                ${css ? `<style>${css}</style>` : ''}
-                ${render(attrs)}
-                `;
+            }
+
+            // Lightweight fallback patch: updates attributes, input values, or text content
+            _patchDOM(attrName, newValue, attrs) {
+                const camelName = attrName.replace(/-([a-z])/g, (_, c) => c.toUpperCase());
+
+                //Target elements explicitly marked for this attribute
+                const boundElements = this.shadowRoot.querySelectorAll(`[data-bind="${attrName}"], [data-bind="${camelName}"], [data-bind*="${attrName}"]`);
+
+                boundElements.forEach(el => {
+                    // Check if binding species an explicit target property (data-bind="src:imageUrl" or similar)
+                    const bindAttr = el.getAttribute('data-bind') || '';
+    
+                    if (bindAttr.includes(':')) {
+                        // Handles explicit mappings like data-bind="src: imageUrl" or data-bind="class: activeClass"
+                    const [targetProp] = bindAttr.split(':').map(s => s.trim());
+                    if (targetProp in el) {
+                        el[targetProp] = newValue;
+                    } else {
+                        el.setAttribute(targetProp, newValue);
+                    }
+                    return;
+                    }
+
+                    // Standard auto detection for Inputs vs Text vs Common Attributes
+                    if (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA') {
+                        if (el.value !== newValue) el.value = newValue;
+                    } else if (el.tagName === 'IMG' && (attrName === 'src' || attrName === 'alt')) {
+                        el.setAttribute(attrName, newValue);
+                    } else if (el.tagName === 'A' && attrName === 'href') {
+                        el.setAttribute('href', newValue);
+                    } else {
+                        el.textContent = newValue;
+                    }
+                });
             }
         }
     );
-
 }

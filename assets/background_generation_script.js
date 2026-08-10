@@ -8,21 +8,34 @@ const canvasContext = canvas ? canvas.getContext('2d') : null;
 
 // FIXED: Prevent getContext from running before elemtn exists in DOM
 function resizeCanvas() {
-  if (!canvas) return;
+  if (!canvas || !canvasContext) return; // Guard both canvas and context
   const dpr = window.devicePixelRatio || 1;
-  canvas.width = window.innerWidth * dpr;
-  canvas.height = window.innerHeight * dpr;
+
+  // FIXED: Use unifed helper
+  const { w, h } = getViewportDimensions();
+
+  // NEW: Sub pixel rounding prevents gaps
+  canvas.width = Math.ceil(w * dpr);
+  canvas.height = Math.ceil(h * dpr);
+
   canvasContext.resetTransform();
   canvasContext.scale(dpr, dpr);
+
   generateStars(); // Re-seed static star positions on screen resize
   generateNebulae(); // Re-seed ambient cloud layers
 }
 
-window.addEventListener('resize', resizeCanvas);
+// Guarded resize callback
+window.addEventListener('resize', () => {
+  if (!canvas || !canvasContext) return;
+  resizeCanvas();
+});
 
 /*=====================================================
 2. CONFIGURATION & PALLETES
 =====================================================*/
+
+// FIXED: Converted to true HSL tuples [Hue (0-360), Saturation (%), Lightness (%)]
 const lightPalette = [
   [14, 55, 48],  // classic terracotta
   [20, 60, 52],  // warm rust
@@ -48,6 +61,7 @@ let activeMeteor = null;
 // STATIC STAR TIWNKLES CONFIG (--DARK MODE ONLY--)
 const stars = [];
 const STAR_COUNT = 600;
+const MAX_PARTICLES = 30; // FIXED: Prevent uncapped array growth
 const HOVER_RADIUS = 120;
 const mouse = { x: -9999, y: -9999 };
 
@@ -79,17 +93,25 @@ function randomRange(min, max) {
   return min + Math.random() * (max - min);
 }
 
+function getViewportDimensions() {
+  return {
+    w: document.documentElement.clientWidth || window.innerWidth,
+    h: document.documentElement.clientHeight || window.innerHeight
+  };
+}
+
 /*=====================================================
 3. GENERATION HELPERS
 =====================================================*/
 
 // Generates radial ambient cloud pools in dark mode sky
 function generateNebulae() {
+  const {w, h} = getViewportDimensions();
   nebulae.length = 0;
   for (let i = 0; i < 4; i++) {
     nebulae.push({
-      x: randomRange(window.innerWidth),
-      y: randomRange(window.innerHeight),
+      x: randomRange(w),
+      y: randomRange(h),
       radius: randomRange(350, 650),
       color: ['270, 50%, 25%', '290, 45%, 20%', '240, 60%, 18%'][i % 3]
     });
@@ -99,6 +121,7 @@ function generateNebulae() {
 // DARK MODE ONLY: Render static twinkling starfield
 // NEW: 3 star depth using background, midground and foreground stars
 function generateStars() {
+  const {w, h} = getViewportDimensions();
   stars.length = 0; // Clear array while maintaining reference
   for (let i = 0;  i < STAR_COUNT; i++) {
     const layer = Math.random();
@@ -122,8 +145,8 @@ function generateStars() {
     }
 
     stars.push({
-      x: randomRange(window.innerWidth),
-      y: randomRange(window.innerHeight),
+      x: randomRange(w),
+      y: randomRange(h),
       size,
       baseAlpha,
       color,
@@ -135,9 +158,10 @@ function generateStars() {
 
 // Meteor that randomly generates every so often
 function spawnMeteor() {
+  const {w, h} = getViewportDimensions();
   activeMeteor = {
-    x: randomRange(window.innerWidth * 0.8),
-    y: randomRange(window.innerHeight * 0.3),
+    x: randomRange(w * 0.8),
+    y: randomRange(h * 0.3),
     length: randomRange(90, 160),
     speed: randomRange(12, 18),
     angle: Math.PI / 4, // 45 degree trajectory
@@ -147,11 +171,15 @@ function spawnMeteor() {
 
 // Track mouse position globally for proximity interactions
 window.addEventListener('mousemove', (e) => {
+  // Guarded mouse movement
+  if (!canvas || !canvasContext) return;
   mouse.x = e.clientX;
   mouse.y = e.clientY;
 });
 
 window.addEventListener('mouseleave', () => {
+  //Guarded mouse leave
+  if (!canvas || !canvasContext) return;
   mouse.x = -9999;
   mouse.y = -9999;
 });
@@ -175,9 +203,22 @@ function drawSparkle(ctx, x, y, radius) {
 }
 
 function drawBackground(ctx, isDark) {
+  // Use clientWidth / clientHeight so it covers the canvas exactly
+  const { w, h } = getViewportDimensions();
+
+  /* FIX: Sub pixel coordinate clipping on radial gradient (prepare for long spiel)
+   When canvas draws radial gradient from center-top (w/2, 0) the outer radius 
+   Math.max(w, h) is calculated from top-center point. 
+   Because the distance from (w/2, 0) to the bottom corners (0, h) or (w, h) is hypotenuse-length (sqrt of {w^2 + h^2})
+   Math.max(w, h) is MATHEMATICALLY SLIGHTLY SMALLER than the distance to the far corners.
+   This can cause narrow unpained seams along left/right canvas boundaries where the browser 
+   default background(White) bleeds through. So, the fix is to increase gradient's outer radius
+   using the full diagonal length (using sqrt of {w^2 + h^2} ) to cover all screen boundaries*/
+  
+  const maxRadius = Math.hypot(w, h); // Guarantees 100% coverage to all corners
   const bgGradient = ctx.createRadialGradient(
-    window.innerWidth / 2, 0, 10,
-    window.innerWidth / 2, 0, Math.max(window.innerWidth, window.innerHeight)
+    w / 2, 0, 10,
+    w / 2, 0, maxRadius
   );
   
   if (isDark) {
@@ -189,7 +230,7 @@ function drawBackground(ctx, isDark) {
   }
 
   ctx.fillStyle = bgGradient;
-  ctx.fillRect(0, 0, window.innerWidth, window.innerHeight);
+  ctx.fillRect(0, 0, w, h);
 
   if (isDark) {
     nebulae.forEach(n => {
@@ -197,8 +238,11 @@ function drawBackground(ctx, isDark) {
       grad.addColorStop(0, `hsla(${n.color}, 0.12)`);
       grad.addColorStop(1, 'transparent');
 
+      // FIXED: Fill only nebula bounding box instead of re-filling the entire screen rectangle
       ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, window.innerWidth, window.innerHeight)
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+      ctx.fill();
     });
   }
 }
@@ -230,9 +274,13 @@ function drawDarkParticle(ctx, particle, radius, opacity) {
   const [hue, sat, lig] = color;
 
   ctx.save(); // 1. Save pristine canvas state
+  // Layer 1: Soft outer glow aura
+  ctx.fillStyle = `hsla(${hue}, ${sat}%, 90%, ${opacity * 0.3})`;
+  drawSparkle(ctx, particle.x, particle.y, Math.max(0, radius * 0.35));
+  ctx.fill();
+
+  // Layer 2: Core sparkle
   ctx.fillStyle = `hsla(${hue}, ${sat}%, ${lig}%, ${opacity})`;
-  ctx.shadowColor = `hsla(${hue}, ${sat}%, 90%, 0.8)`; // Very bright core color
-  ctx.shadowBlur = 8;                                 // Soft intense halo
   // drawSparkle already calls beginPath() internally!
   drawSparkle(ctx, particle.x, particle.y, Math.max(0, radius * 0.2));
   ctx.fill();
@@ -271,13 +319,17 @@ function drawStarfield(ctx, now) {
       const haloRatio = 1 - (dist / (HOVER_RADIUS * 0.4));
       ctx.beginPath();
       ctx.arc(star.x, star.y, renderSize * 1.8, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(230, 215, 255, ${haloRatio * 0.15})`;
+
+      // FIXED: Use the stars unique color string
+      ctx.fillStyle = `rgba(${star.color}, ${haloRatio * 0.15})`;
       ctx.fill();
     }
   }
 }
 
 function drawMeteors(ctx) {
+  const { w } = getViewportDimensions();
+
   if (!activeMeteor && Math.random() < 0.0025) {
     spawnMeteor();
   }
@@ -302,18 +354,80 @@ function drawMeteors(ctx) {
     ctx.stroke();
     ctx.restore();
 
-    if (activeMeteor.progress > window.innerWidth * 0.7) {
+    if (activeMeteor.progress > w * 0.7) {
       activeMeteor = null;
     }
   }
 }
 
 /*=====================================================
-5. CORE ENGINE & ANIMATION LOOP
+6. TAB VISIBILITY HANDLERS
+=====================================================*/
+
+// Controls for tab visibility management
+let animFrameId = null;
+let spawnIntervalId = null;
+let lastPauseTime = 0;
+
+function startAnimation() {
+  // Prevent duplicate intervals/loops if already running
+  if (!spawnIntervalId) {
+    spawnIntervalId = setInterval(spawnParticle, settings.intervalTime);
+  }
+  if (!animFrameId) {
+    animFrameId = requestAnimationFrame(animateBackground);
+  }
+}
+
+function stopAnimation() {
+  // Clear spawn timer
+  if (spawnIntervalId) {
+    clearInterval(spawnIntervalId);
+    spawnIntervalId = null;
+  }
+  
+  // Cancel active animation frame loop
+  if (animFrameId) {
+    cancelAnimationFrame(animFrameId);
+    animFrameId = null;
+  }
+}
+
+function handleVisibilityChange(){
+  if(document.hidden) {
+    // Record when paused so we can offset particle birth times on return
+    lastPauseTime = performance.now();
+    stopAnimation();
+  } else {
+    // Shift particle birth times forward by paused duration so particles resume at same life %
+    if (lastPauseTime > 0) {
+      const elapsedPause = performance.now() - lastPauseTime;
+      particles.forEach(p => {
+        p.born += elapsedPause;
+      });
+      lastPauseTime = 0;
+    }
+    startAnimation();
+  }
+  }
+
+  document.addEventListener('visibilitychange', () => {
+    if (!canvas || !canvasContext) return;
+    handleVisibilityChange();
+  });
+
+/*=====================================================
+7. CORE ENGINE & ANIMATION LOOP
 =====================================================*/
 
 // FIXED: Renamed function spawnCircle to spawnParticle
 function spawnParticle(isInitial = false) {
+
+  // Cap maximum particle load
+  if (particles.length >= MAX_PARTICLES) return;
+
+  const {w, h} = getViewportDimensions();
+
   // Check active theme
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
   const activeSettings = isDark ? settings.dark : settings.light;
@@ -329,8 +443,8 @@ function spawnParticle(isInitial = false) {
   const ageOffset = isInitial ? randomRange(0, particleLife * 0.5) : 0;
 
   particles.push({
-    x: randomRange(window.innerWidth), 
-    y: randomRange(window.innerHeight), 
+    x: randomRange(w), 
+    y: randomRange(h), 
     radius,
     colorIndex,
     born: performance.now() - ageOffset,
@@ -341,6 +455,7 @@ function spawnParticle(isInitial = false) {
 
 // FIXED: Changes from drawCircle to animateBackground
 function animateBackground() {
+
   const now = performance.now();
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
 
@@ -372,7 +487,8 @@ function animateBackground() {
     if (time >= 1) particles.splice(i, 1);
   }
 
-  requestAnimationFrame(animateBackground);
+  // Store frame ID so it can be canceled on tab blur
+  animFrameId = requestAnimationFrame(animateBackground);
 }
 
 export function initCanvasAnimation() {
@@ -385,6 +501,6 @@ export function initCanvasAnimation() {
     spawnParticle(true);
   }
 
-  setInterval(spawnParticle, settings.intervalTime);
-  requestAnimationFrame(animateBackground);
+  // Start spawning/rendering
+  startAnimation();
 }
