@@ -1,8 +1,3 @@
-button {
-  all: unset;
-  cursor: pointer; /* Restores the clickable hand cursor */
-}
-
 /*===================================================== 
 1. LITERAL COLOR TOKENS
 
@@ -164,8 +159,91 @@ If a value here is changed, it'll update across the site.
   --min-card-width:20rem;
 }
 
+/*=====================================================
+4. HTML ROLE-BASED TOKENS
+=====================================================*/
+
+/* Modern Reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden;
+  background-color: transparent;
+  color: rgb(var(--text-primary));
+}
+
+html {
+  background-color: rgb(var(--soft-pillow)); /* Light theme default background fallback */
+}
+
+[data-theme="dark"] {
+  background-color: rgb(var(--obsidian)); /* Dark theme default background fallback*/
+}
+
+html, body {
+  overflow: hidden; /* Prevents scrollbar trigger during init */
+}
+
+canvas { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
+  display: block;
+  position: fixed; /* Fixed: changed from absolute so it covers the screen during scoll*/
+  top: -10px;
+  left: -10px;
+  width: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
+  height: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
+  z-index: -1;
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+svg { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
+  width:var(--icon-size-std);
+  height: auto;
+  max-width: 100%;
+}
+
+.avatar-circle { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
+  border-radius: var(--radius-full);
+  object-fit: cover;
+  aspect-ratio: 1 / 1;
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0; /* Prevents hero flex container from shrinking image */
+}
+
+button {
+  all: unset;
+  cursor: pointer;
+}
+
+button:focus-visible {
+  outline: 2px solid rgb(var(--text-accent));
+  outline-offset: 2px;
+}
+
+header nav {
+  min-height: 2.5rem;
+}
+
+header nav a,
+#theme-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 2.5rem;
+  line-height: 1;
+}
+
 /*===================================================== 
-4. THEMED ROLE UTILITIES
+5. THEMED ROLE UTILITIES
 
 Use these for page structure so theme toggling works automatically.
 =====================================================*/
@@ -215,7 +293,7 @@ Use these for page structure so theme toggling works automatically.
 .text-status { color: rgb(var(--text-status)); }
 
 /*=====================================================
-5. COLOR PALETTE - LITERAL UTILITY CLASSES 
+6. COLOR PALETTE - LITERAL UTILITY CLASSES 
 
 Fixed colors unaffected by theme.
 =====================================================*/
@@ -293,7 +371,7 @@ Fixed colors unaffected by theme.
 }
 
 /* =====================================================
-6. UNIVERSAL ALPHA MODIFIERS
+7. UNIVERSAL ALPHA MODIFIERS
 
 Combine these with ANY -bg class above, or role-based bg class.
 ===================================================== */
@@ -304,7 +382,7 @@ Combine these with ANY -bg class above, or role-based bg class.
 .bg-alpha-25 { background-color: rgb(var(--active-color) / 0.25); }
 
 /* =====================================================
-7. TYPOGRAPH UTILITIES 
+8. TYPOGRAPH UTILITIES 
 ===================================================== */
 
 /* Font Families */
@@ -350,30 +428,18 @@ h6 { font-size: var(--text-sm); }
 /* Text Alignment & Decoration */
 
 .text-align-center { text-align: center; }
-
-.no-text-decoration { 
-  text-decoration: none; 
-}
+.no-text-decoration { text-decoration: none; }
 
 /* =====================================================
-7. LAYOUT, BOX MODEL & SPACING
+9. LAYOUT, BOX MODEL & SPACING
 ===================================================== */
 
-/* Modern Reset */
+/* Page Grid Layout */
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-}
-
-body {
-  /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
-  width: 100%;
-  min-height: 100vh;
-  overflow-x: hidden;
+.grid-container { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  min-height: 100dvh;
 }
 
 /* Flexbox Helpers */
@@ -417,14 +483,6 @@ body {
 .rounded-corners { border-radius: var(--radius-md); }
 .circle-corners { border-radius: var(--radius-lg); }
 
-.avatar-circle { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
-  border-radius: var(--radius-full);
-  object-fit: cover;
-  aspect-ratio: 1 / 1;
-  max-height: 75%;
-  width: auto;
-}
-
 /* Padding Utilities */
 
 .p-2xs { padding: var(--space-2xs); }
@@ -435,7 +493,7 @@ body {
 .p-xl { padding: var(--space-xl); }
 .p-2xl { padding: var(--space-2xl); }
 .p-3xl { padding: var(--space-3xl); }
-.py-4xl { padding: var(--space-4xl); }
+.p-4xl { padding: var(--space-4xl); }
 
 .px-xs { padding-inline: var(--space-xs); }
 .px-sm { padding-inline: var(--space-sm); }
@@ -468,56 +526,101 @@ body {
 
 .min-width-color { min-width: var(--min-card-width); }
 
-/* Page Grid Layout */
-
-.grid-container { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  min-height: 100dvh;
-  gap: var(--spacing-lg)
-}
-
 /* =====================================================
-8. SPECIFIC ELEMENT DEFAULTS & BREAKOUTS
+10. SPECIFIC ELEMENT DEFAULTS & BREAKOUTS
 ===================================================== */
 
-/* SVG Utilities */
+.svg-gap {gap: var(--space-sm);}
 
-svg { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
-  width:var(--icon-size-std);
-  height: auto;
-  max-width: 100%;
-}
-
-.svg-gap {gap: var(--spacing-sm);}
-
-/* Background Canvas */
-
-canvas { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
-  display: block;
-  position: fixed; /* Fixed: changed from absolute so it covers the screen during scoll*/
-  top: -10px;
-  left: -10px;
-  width: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
-  height: calc(100% + 20px); /* FIXED: 100vw/100vh includes width of vertical scrollbar, can make body/canvas stretch wider than actual element viewport*/
-  z-index: -1;
-  pointer-events: none;
-  filter: blur(1px);
-}
-
-/* Media Queries */
-
-@media only screen and (max-width: 600px) {
-  /*=========================s============================TO DO: ADD MEDIA BREAK POINTS*/
-}
-
-/*=====================================================
-9. FROSTED GLASS UTILITY
-=====================================================*/
-
+/* Frosted Glass Effect */
 .glass {
   /*Blurs the canvas/content underneath element*/
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   box-shadow: 0 4px 20px rgb(0 0 0 / 0.05);
+}
+
+/* =====================================================
+11. WEB COMPONENT SKELETONS GUARDS
+===================================================== */
+
+/* Force custom tags to act as block-level inline elements immediately*/
+/* Ensure defined custom elements retain baseline display dimensions */
+h1, .birthstone-bounce {
+  font-family: 'Birthstone Bounce', cursive, sans-serif;
+  line-height: 1.2; /* Lock vertical height */
+}
+
+content-box,
+desc-button,
+tag-box {
+  display: inline-block;
+  box-sizing: border-box;
+  vertical-align: middle;
+  contain: layout style; /* Prevents internal layout shifts from leaking out */
+}
+
+content-box {
+  min-width: 7.5rem;
+  min-height: 2.5rem;
+}
+
+tag-box {
+  min-width: 10.5rem;
+  min-height: 1.75rem;
+}
+
+desc-button {
+  display: block;
+  width: 100%;
+  min-height: 5.5rem;
+}
+
+/* Un-defined state prevention */
+content-box:not(:defined),
+desc-button:not(:defined),
+tag-box:not(:defined) {
+  opacity:0
+}
+
+/* Defined state */
+content-box:defined,
+desc-button:defined,
+tag-box:defined {
+  opacity: 1;
+}
+
+/* Structural page fade-in */
+header,
+main,
+footer {
+  opacity: 0;
+  transform: translateY(-28px);
+  will-change: opacity, transform;
+  animation: slideFadeDown 1.2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+/* Staggered start times */
+header { animation-delay: 0.1s; }
+main   { animation-delay: 0.25s; }
+footer { animation-delay: 0.4s; }
+
+/* Keyframes */
+@keyframes slideFadeDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-28px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================================
+12. MEDIA BREAKPOINTS
+===================================================== */
+
+@media only screen and (max-width: 600px) {
+  /*=========================s============================TO DO: ADD MEDIA BREAK POINTS*/
 }
