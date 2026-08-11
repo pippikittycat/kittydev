@@ -6,8 +6,13 @@ import styles from '../global.css' with { type: 'css' };*/
 
 // Declared once in memory, shared across all <tag-box> instances
 const VARIANT_MAP = {
-  light: 'bg-primary text-tertiary lborder',
-  dark: 'bg-tertiary text-highlight dborder'
+  light: 'lcontent-box-bgc lcontent-box-tc lcontent-box-brc',
+  dark: 'dcontent-box-bgc dcontent-box-tc dcontent-box-brc'
+};
+
+const SVG_VARIANT_MAP = {
+  light: 'lcontent-box-sc',
+  dark: 'dcontent-box-sc'
 };
 
 createComponent({
@@ -19,29 +24,34 @@ createComponent({
 
     // Url link classes (typically same)
     const urlUtilities = 'no-text-decoration block fit-content';
-    
+
     // Fallback to 'light' if variant is missing or unrecognized
     const colorUtilities = VARIANT_MAP[variant] || VARIANT_MAP.light;
+    const svgVariantClass = SVG_VARIANT_MAP[variant] || SVG_VARIANT_MAP.light;
 
     return `
     ${urlLink ? `<a class="${urlUtilities}" href="${urlLink}">` : ''}
       <div class="${baseUtilities} ${colorUtilities}">
-      ${svg ? `${svg}` : ''}
+      ${svg ? `
+        <svg class="icon ${svgVariantClass}" aria-hidden="true">
+          <use href="${svg}"></use>
+        </svg>
+      ` : ''}
       ${text ? `<p>${text}</p>` : ''}
       </div>
     ${urlLink ? '</a>' : ''}
   `;
-},
+  },
   error: ({ text, svg }) => {
-  // Check if text is missing, null, undefined, or just empty whitespace
-  // Safely coerce to string before trimming to avoid type errors
-  const isTextMissing = !text || String(text).trim() === '';
-  const isSvgMissing = !svg || String(svg).trim() === '';
+    // Check if text is missing, null, undefined, or just empty whitespace
+    // Safely coerce to string before trimming to avoid type errors
+    const isTextMissing = !text || String(text).trim() === '';
+    const isSvgMissing = !svg || String(svg).trim() === '';
 
-  // Trigger error ONLY if BOTH are missing
-  if (isTextMissing && isSvgMissing) {
-    console.error(
-      `Error: Both 'text' and 'svg' are missing or empty. At least one must be provided to render <content-box>.`
+    // Trigger error ONLY if BOTH are missing
+    if (isTextMissing && isSvgMissing) {
+      console.error(
+        `Error: Both 'text' and 'svg' are missing or empty. At least one must be provided to render <content-box>.`
       );
     }
   },
