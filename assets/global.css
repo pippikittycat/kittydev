@@ -24,6 +24,7 @@ rgb(var(--mistletoe) / 0.25).
   --pale-beige-8: 214, 200, 187;
   --off-white-9: 237, 231, 221;
   --pale-ivory-10: 245, 242, 235;
+  --white-11: 255, 255, 255;
 
   /* Dark Mode Palette */
   --obsidian: 18 16 22;
@@ -91,14 +92,14 @@ Mappings below are a starting point- swap any of the literal tokens based on pre
   --ldescbtn-desc-tc: var(--medium-brown-4);
   --ldescbtn-left-sc: var(--light-tan-6);
   --ldescbtn-right-sc: var(--pale-beige-8);
-  --ldescbtn-brc: var(--off-white-9);
+  --ldescbtn-brc: var(--warm-beige-7);
   --ldescbtn-bgc: var(--pale-ivory-10);
 
   /* Footer */
-  --f-copyright-tc: var(--warm-beige-7);
+  --f-copyright-tc: var(--golden-tan-5);
   --f-brc: var(--off-white-9);
   --f-sc: var(--medium-brown-4);
-  --f-bgc: var(--pale-ivory-10);
+  --f-bgc: var(--white-11);
 
   }
 
@@ -196,7 +197,7 @@ If a value here is changed, it'll update across the site.
     --radius-full: 50%;
 
     --border-width-sm: 0.050rem;
-    --border-width-std: 0.075rem;
+    --border-width-std: 0.07rem;
     --icon-size-std: 1rem;
 
     --min-card-width:20rem;
@@ -400,8 +401,10 @@ Use these for page structure so theme toggling works automatically.
   }
 
   .b-bgc {
-    background-color: rgb(var(--b-bgc));
-    --active-color: var(--b-bgc);
+    /* Standard fallback */
+    background-color: rgb(245, 242, 235);
+    /* Safe RGBA version that never drops out */
+    background-color: rgba(var(--pale-ivory-10), 0.70);
   }
 
   .b-brc {
@@ -483,8 +486,10 @@ Use these for page structure so theme toggling works automatically.
   }
 
   .f-bgc {
-    background-color: rgb(var(--f-bgc));
-    --active-color: var(--f-bgc);
+    /* Standard fallback */
+    background-color: rgb(245, 242, 235);
+    /* Safe RGBA version that never drops out */
+    background-color: rgba(var(--pale-ivory-10), 0.60);
   }
 
   /* =====================================================
@@ -494,7 +499,7 @@ Combine these with ANY -bg class above, or role-based bg class.
 ===================================================== */
 
   .bg-alpha-90 {
-    background-color: rgb(var(--active-color) / 0.90);
+    background-color: rgb(var(--active-color) / 1); /* Force full opacity test */
   }
 
   .bg-alpha-75 {
