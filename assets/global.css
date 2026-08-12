@@ -189,10 +189,6 @@ html {
   background-color: rgb(var(--obsidian)); /* Dark theme default background fallback*/
 }
 
-html, body {
-  overflow: hidden; /* Prevents scrollbar trigger during init */
-}
-
 canvas { /*=====================================================TO DO: EXAMINE IF NECESSARY FOR MULTIPLE PARAMETERS*/
   display: block;
   position: fixed; /* Fixed: changed from absolute so it covers the screen during scoll*/
@@ -621,6 +617,71 @@ footer { animation-delay: 0.4s; }
 12. MEDIA BREAKPOINTS
 ===================================================== */
 
+/* Desktop screens enforced locked single-page fit */
+@media only screen and (min-width: 1025px) and (min-height: 800px) {
+  html, body {
+    overflow: hidden; /* Locks scrollbars on large screens if everything fits*/
+  }
+}
+
+/* Laptops and smaller screens where content needs to scroll */
+@media only screen and (max-width: 1200px), (max-height: 799px) {
+  html, body {
+    overflow-y: auto !important; /* Re-enables scrollbar */
+    overflow-x: hidden;
+  }
+
+  /* Reduce heavy container padding so content fits comfortably */
+  main {
+    padding-inline: var(--space-2xl) !important; /* Drops px-4xl (6rem) down to 3rem*/
+  }
+}
+
+/* Tablet & smaller laptop screens (max-width: 900px)*/
+@media only screen and (max-width: 900px) {
+  main {
+    padding-inline: var(--space-lg) !important;
+  }
+
+  /* Stack the main hero section image and text vertically */
+  main > section > section.flex.row {
+    flex-direction: column !important;
+    align-items: center;
+    text-align: center;
+  }
+
+  /* Center alignment for stacked hero elements */
+  main > section > section.flex.row .avatar-circle {
+    margin-bottom: var(--space-md);
+  }
+
+  /* Stack the three EXPLORE desc buttons vertically */
+  #explore-nav,
+  main section nav.flex.space-between {
+    flex-direction: column !important;
+    gap: var(--space-md);
+  }
+
+  desc-button {
+    width: 100% !important;
+  }
+}
+
+/* Mobile screens (max-width: 600px)*/
 @media only screen and (max-width: 600px) {
-  /*=========================s============================TO DO: ADD MEDIA BREAK POINTS*/
+  main {
+    padding-inline: var(--space-md) !important;
+    padding-block: var(--space-md) !important;
+  }
+
+  header {
+    flex-direction: column;
+    gap: var(--space-sm);
+    padding: var(--space-sm) !important;
+  }
+
+  header nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
 }
